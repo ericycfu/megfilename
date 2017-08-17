@@ -10,16 +10,11 @@ class GUI:
 
         self.master = master
         master.title("String Generator")
-        # self.default_font = font.nametofont("TkDefaultFont")
-        # self.default_font.configure(family = "Times New Roman", size = 12)
 
         # define all objects and variables
         self.mainframe = ttk.Frame(master, padding=(20, 20, 20, 20))
-        # remove line below and uncomment the multiline comment
-        # self.name = " ".join(self.read_file(pat))
         self.name = self.read_file2(pat).split("/")[1]
-        # to remove spaces in front of name, and potential multiple spaces in name
-        self.name = self.name.strip()  # .lstrip() removes whitespace from beginning only
+        self.name = self.name.strip()
 
         self.initials = self.name.split()
         try:
@@ -41,15 +36,10 @@ class GUI:
         self.first_menu_list = self.read_file(dpbox1)
         self.first_menu_var.set(self.first_menu_list[0])
         self.first_menu = OptionMenu(self.mainframe, self.first_menu_var, *self.first_menu_list)
-        ''' Replace env_var_name with environment variable name
-        Also, this makes the list go from 0 to env_var_name -1.
-        So, to go from 1 to env_var_name, change 0 to one, and do self.num_limit + 1
- 	'''
         try:
             self.num_limit = int(os.environ['MEGFILENAME_MAX_INDEX'])
             self.num_menu_list = list(range(1, self.num_limit + 1))
         except:
-            # comment this bottom line out when the above lines are finished.
             self.num_menu_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
         self.num_menu_list = ['Autopick'] + self.num_menu_list
@@ -137,7 +127,6 @@ class GUI:
         self.update_label(self.num_menu_var, self.num_menu_var2, self.current_index)
 
         # returns a list of the words in the text file
-
     def read_file(self, path):
         f = open(path, "r")
         return f.read().split()
@@ -150,7 +139,6 @@ class GUI:
         root.destroy()
 
         # executes before combine
-
     def update_label(self, tkvar, tkvar2, current_index):
         prefix = "Current Index: "
         if tkvar2.get() != "Autopick":
@@ -219,11 +207,11 @@ class GUI:
             return
         curr_line = curr_line.split("/")
         for i in range(len(curr_line) - 1, -1, -1):
-            curr_line[i] = curr_line[i].strip()  # remove whitespace
+            curr_line[i] = curr_line[i].strip()
         to_process = curr_line[0]
         to_process = to_process.split("_")
         for i in range(len(to_process) - 1, -1, -1):
-            to_process[i] = to_process[i].strip()  # remove whitespace again
+            to_process[i] = to_process[i].strip()
         curr_line[0] = self.add_initials(to_process)
         self.output2_text.delete(1.0, END)
         self.output3_text.delete(1.0, END)
