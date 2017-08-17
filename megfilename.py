@@ -10,8 +10,12 @@ class GUI:
 
         self.master = master
         master.title("String Generator")
+        self.initialize_variables(master, dpbox1, dpbox2, dpbox3, pat)
+        self.format_layout(master)
+    # functions/methods
 
-        # define all objects and variables
+        #initializes objects and variables
+    def initialize_variables(self, master, dpbox1, dpbox2, dpbox3, pat):
         self.mainframe = ttk.Frame(master, padding=(20, 20, 20, 20))
         self.name = self.read_file2(pat).split("/")[1]
         self.name = self.name.strip()
@@ -74,6 +78,7 @@ class GUI:
                                                                       self.loc_menu_var,
                                                                       self.eeg_meg_var, self.output1_text,
                                                                       self.output2_text, self.current_index))
+        self.combine_button.bind("<Button-1>", self.callback)
         self.exit_button = ttk.Button(self.mainframe, text='Exit', command=lambda: self.exit_func(master))
         self.output1_label = ttk.Label(self.mainframe, text='SEF/MEF File String: ')
         self.output1_text = Text(self.mainframe, width=60, height=2, font=("Times New Roman", 16))
@@ -82,10 +87,8 @@ class GUI:
         self.output3_label = ttk.Label(self.mainframe, text='Additional Comments: ')
         self.output3_text = Text(self.mainframe, width=60, height=2, font=("Times New Roman", 16))
 
-        # is there a cleaner way instead of wrapping update_label inside of callback?
-        self.combine_button.bind("<Button-1>", self.callback)
-
-        # layout
+        #configures the layout(spacing, placement, size, etc.)
+    def format_layout(self, master):
         self.master.columnconfigure(1, weight=1)
         self.master.rowconfigure(1, weight=1)
         self.mainframe.grid(row=1, column=1, sticky=(N, E, S, W))
@@ -121,7 +124,7 @@ class GUI:
         self.output3_label.grid(row=7, column=1, sticky=(N, W, S), padx=10, pady=15)
         self.output3_text.grid(row=7, column=2, columnspan=4, sticky=(N, E, S, W), pady=15)
 
-    # functions/methods
+
 
     def callback(self, event):
         self.update_label(self.num_menu_var, self.num_menu_var2, self.current_index)
