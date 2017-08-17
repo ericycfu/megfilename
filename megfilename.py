@@ -194,13 +194,16 @@ class GUI:
             lines = f.read().split("\n")
             #removes blank/whitespace lines from protocol
             myiter = iter(lines)
+            num_blank_lines = 0
             while True:
                 try:
                     line = next(myiter)
                     if (line.strip() == ""):
-                        lines.remove(line)
+                        num_blank_lines += 1
                 except StopIteration:
                     break
+            for i in range(0, num_blank_lines):
+                lines.remove(line)
             f.close()
             self.output3_text.delete(1.0, END)
             self.output3_text.insert(1.0, "Functional Meg selected. Press \"Next Protocol Step\"")
