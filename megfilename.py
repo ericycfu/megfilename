@@ -66,7 +66,12 @@ class GUI:
         self.eeg_meg_list = self.read_file(dpbox3)
         self.eeg_meg_var.set(self.eeg_meg_list[0])
         self.eeg_meg_menu = OptionMenu(self.mainframe, self.eeg_meg_var, *self.eeg_meg_list)
-        self.reset_button = ttk.Button(self.mainframe, text='reset',
+        self.protocol_var = StringVar()
+        self.protocol_list = ["Choose Protocol", "Functional Meg"]
+        self.protocol_var.set(self.protocol_list[0])
+        self.protocol_menu = OptionMenu(self.mainframe, self.protocol_var, *self.protocol_list)
+        self.exec_protocol_button = ttk.Button(self.mainframe, text="Start Protocol", command=self.protocol)
+        self.reset_button = ttk.Button(self.mainframe, text='Reset',
                                        command=lambda: self.reset(self.first_menu_var, self.num_menu_var2,
                                                                   self.user_text, self.loc_menu_var,
                                                                   self.eeg_meg_var, self.output1_text,
@@ -79,11 +84,13 @@ class GUI:
                                                                       self.loc_menu_var,
                                                                       self.eeg_meg_var, self.output1_text,
                                                                       self.output2_text, self.current_index))
-        self.exit_button = ttk.Button(self.mainframe, text='exit', command=lambda: self.exit_func(master))
+        self.exit_button = ttk.Button(self.mainframe, text='Exit', command=lambda: self.exit_func(master))
         self.output1_label = ttk.Label(self.mainframe, text='SEF/MEF File String: ')
         self.output1_text = Text(self.mainframe, width=60, height=2, font=("Times New Roman", 16))
         self.output2_label = ttk.Label(self.mainframe, text='RAW File String: ')
         self.output2_text = Text(self.mainframe, width=60, height=2, font=("Times New Roman", 16))
+        self.output3_label = ttk.Label(self.mainframe, text='Additional Comments: ')
+        self.output3_text = Text(self.mainframe, width=60, height=2, font=("Times New Roman", 16))
 
         # is there a cleaner way instead of wrapping update_label inside of callback?
         self.combine_button.bind("<Button-1>", self.callback)
@@ -112,13 +119,17 @@ class GUI:
         self.user_entry.grid(row=3, column=3, sticky=(N, E, S, W), padx=10, pady=15)
         self.loc_menu.grid(row=3, column=4, sticky=(N, E, S, W), padx=10, pady=15)
         self.eeg_meg_menu.grid(row=3, column=5, sticky=(N, E, S, W), padx=10, pady=15)
-        self.reset_button.grid(row=4, column=1, sticky=(N, E, S, W), padx=10, pady=15)
-        self.combine_button.grid(row=4, column=2, sticky=(N, E, S, W), padx=10, pady=15)
-        self.exit_button.grid(row=4, column=3, sticky=(N, E, S, W), padx=10, pady=15)
+        self.protocol_menu.grid(row=4, column=1, sticky=(N, E, S, W), padx=10, pady=15)
+        self.exec_protocol_button.grid(row=4, column=2, sticky=(N, E, S, W), padx=10, pady=15)
+        self.reset_button.grid(row=4, column=4, sticky=(N, E, S, W), padx=10, pady=15)
+        self.combine_button.grid(row=4, column=3, sticky=(N, E, S, W), padx=10, pady=15)
+        self.exit_button.grid(row=4, column=5, sticky=(N, E, S, W), padx=10, pady=15)
         self.output1_label.grid(row=5, column=1, sticky=(N, W, S), padx=10, pady=15)
         self.output1_text.grid(row=5, column=2, columnspan=4, sticky=(N, E, S, W), pady=15)
         self.output2_label.grid(row=6, column=1, sticky=(N, W, S), padx=10, pady=15)
         self.output2_text.grid(row=6, column=2, columnspan=4, sticky=(N, E, S, W), pady=15)
+        self.output3_label.grid(row=7, column=1, sticky=(N, W, S), padx=10, pady=15)
+        self.output3_text.grid(row=7, column=2, columnspan=4, sticky=(N, E, S, W), pady=15)
 
     # functions/methods
 
@@ -176,6 +187,60 @@ class GUI:
         text2.delete(1.0, END)
         self.current_index = [0]
         self.num_menu_var.set("Current Index: 0")
+        # reset the protocol menu
+        self.protocol_var.set(self.protocol_list[0])
+        # reset the protocol button command
+        self.exec_protocol_button.configure(text="Start Protocol", command=self.protocol)
+        # reset the extra comments
+        self.output3_text.delete(1.0, END)
+
+    # allows for future protocols to be added and edited.
+    def protocol(self):
+        if (self.protocol_var.get() == "Choose Protocol"):
+            pass
+        elif (self.protocol_var.get() == "Functional Meg"):
+            self.output1_text.delete(1.0, END)
+            self.output2_text.delete(1.0, END)
+            self.output3_text.delete(1.0, END)
+            f = open("mfn-funcmegprotocol.txt")
+            lines = f.read().split("\n")
+            f.close()
+            self.output3_text.delete(1.0, END)
+            self.output3_text.insert(1.0, "Functional Meg selected. Press \"Next Protocol Step\"")
+            self.exec_protocol_button.configure(text="Next Protocol Step", command=lambda: self.functional_meg(lines))
+
+    def functional_meg(self, lines):
+        try:
+            curr_line = lines.pop(0)
+        except:
+            self.reset(self.first_menu_var, self.num_menu_var2, self.user_text, self.loc_menu_var,
+                       self.eeg_meg_var, self.output1_text, self.output2_text, self.first_menu_list,
+                       self.num_menu_list, self.loc_menu_list, self.eeg_meg_list)
+            return
+        curr_line = curr_line.split("/")
+        for i in range(len(curr_line) - 1, -1, -1):
+            curr_line[i] = curr_line[i].strip()  # remove whitespace
+        to_process = curr_line[0]
+        to_process = to_process.split("_")
+        for i in range(len(to_process) - 1, -1, -1):
+            to_process[i] = to_process[i].strip()  # remove whitespace again
+        curr_line[0] = self.add_initials(to_process)
+        self.output2_text.delete(1.0, END)
+        self.output3_text.delete(1.0, END)
+        self.output2_text.insert(1.0, curr_line[0])
+        if (len(curr_line) == 2):
+            self.output3_text.insert(1.0, curr_line[1])
+
+    def add_initials(self, mylist):
+        x = iter(mylist)
+        # returns the value of the number in the list, and then gives the index of that number
+        try:
+            number = next(string for string in x if string.isdigit())
+        except StopIteration:  # reached last line of protocol, curr_line[0] should be empty string
+            return ""
+        index = mylist.index(number)
+        mylist.insert(index + 1, self.initials)
+        return "_".join(mylist)
 
 
 dpbox1_fname = "mfn-dropdownbox1.txt"
