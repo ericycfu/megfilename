@@ -16,37 +16,13 @@ class GUI:
     #initializes objects and variables
     def initialize_variables(self, dpbox1, dpbox2, dpbox3, pat):
         self.mainframe = ttk.Frame(self.master, padding=(20, 20, 20, 20))
-        #gets patient name, as file has format where name is the second element between forward slashes
-        self.name = self.read_file(pat).split("\n")#newest patient loaded will be on last line of file
-        #removes blank lines from the file with a list of patient stuff.
-        print(len(self.name))
-        myiter = iter(self.name)
-        num_blank_lines = 0
-        while True:
-            try:
-                line = next(myiter)
-                if (line.strip() == ""):
-                    num_blank_lines += 1
-            except StopIteration:
-                break
-        for i in range(0, num_blank_lines):
-            self.name.remove(line)
-        print(len(self.name))
-        self.name = self.name[len(self.name)-1] #gets last line
-        print(self.name)
-        self.name = self.name.split("/")[1]
-        self.name = self.name.strip()
+        self.pat = pat
         #gets initials from name, if only one word as name, duplicates the first initial
-        self.initials = self.name.split()
-        try:
-            self.initials = self.initials[0][0] + self.initials[len(self.initials) - 1][0]
-            self.initials = self.initials.lower()
-        except:
-            print("Name does not have at least 2 words")
-            self.initials = self.initials[0][0]
-            self.initials = self.initials.lower()
+        (self.name, self.initials) = self.get_name_initials()
         #initializes the menus, labels, and vars that are used in the menus
-        self.name_label = ttk.Label(self.mainframe, text="Patient Name: " + self.name)
+        self.name_label_var = StringVar()
+        self.name_label_var.set("Patient Name: " + self.name)
+        self.name_label = ttk.Label(self.mainframe, textvariable = self.name_label_var)
         self.num_menu_var = StringVar() #used as the variable to update the label
         self.num_menu_var2 = StringVar()    #used as the variable in the menu
         self.current_index = 0  #used to record the last used index to update the label
@@ -94,6 +70,34 @@ class GUI:
         self.reset_button = ttk.Button(self.mainframe, text='Reset', command = self.reset)
         self.combine_button = ttk.Button(self.mainframe, text='New String', command= self.combine)
         self.combine_button.bind("<Button-1>", self.callback_combine_button)
+
+    #gets the name and initials from file and returns it
+    def get_name_initials(self):
+        # gets patient name, as file has format where name is the second element between forward slashes
+        name = self.read_file(self.pat).split("\n")  # newest patient loaded will be on last line of file
+        # removes blank lines from the file with a list of patient stuff.
+        myiter = iter(name)
+        num_blank_lines = 0
+        while True:
+            try:
+                line = next(myiter)
+                if (line.strip() == ""):
+                    num_blank_lines += 1
+            except StopIteration:
+                break
+        for i in range(0, num_blank_lines):
+            name.remove(line)
+        name = name[len(name) - 1]  # gets last line
+        name = name.split("/")[1]
+        name = name.strip()
+        initials = name.split()
+        try:
+            initials = initials[0][0] + initials[len(initials) - 1][0]
+            initials = initials.lower()
+        except: #likely doesn't even execute, unless name is empty
+            print("Name is empty or format unexpected, defaulted to aa")
+            initials = "aa"
+        return (name,initials)
 
     #configures the layout(spacing, placement, size, etc.)
     def format_layout(self):
@@ -187,7 +191,9 @@ class GUI:
         self.loc_menu_var.set(self.loc_menu_list[0])
         self.eeg_meg_var.set(self.eeg_meg_list[0])
         self.protocol_var.set(self.protocol_list[0])
-        #reset the user text to the initials from the patient file
+        #reset the user text to the initials from the patient file and the name of the patient
+        (self.name, self.initials) = self.get_name_initials()
+        self.name_label_var.set("Patient Name: " + self.name)
         self.user_text.set(self.initials)
         #reset the text outputs
         self.output1_text.delete(1.0, END)
