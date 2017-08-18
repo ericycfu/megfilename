@@ -1,13 +1,13 @@
-lang_tones_01_raw / Load: 3-Lang-IRB-2014-1K
+lang_tones_01_raw / Load: 3-Lang_IRB_2014_1K. Start Stim2 => Attention => AudioCPT. Load: 1_Tones: Alternating_monaural_1khz.aud
 lang_tones_02_raw
-lang_bapafrench_03_raw
+lang_bapafrench_03_raw / Stim2, Load: 2_BaPa: French : ba_pa_French.aud
 lang_bapafrench_04_raw
-lang_papnicolaou_05_raw
+lang_papanicolaou_05_raw / Exit and restart Stim2 => Gentask, Load: 4_Papanicolaou: language_listening.gen
 lang_papanicolaou_06_raw
-mef_left_hand_07_raw / Load: 2-MEF-clinical
-mef_right_hand_08_raw
-spont_initial_09_raw / Load: 1-SPONT
-sef_10_bl_median_raw / Load: Filler String(no forward slashes allowed)-SEF instruction goes here
+mef_left_hand_07_raw / Load: 2-MEF_clinical, Turn averaging on, 60 self-paced finger taps left hand.
+mef_right_hand_08_raw / 60 self-paced finger taps right hand.
+spont_initial_09_raw / Load: 1-SPONT_Clinical, record at least 20 minutes.
+sef_10_bl_median_raw / Load: 2-SEFBI_Clinical
 sef_11_bl_median_raw
  / Protocol Done. Press "Next Protocol Step" or "Reset" to reset everything.
 

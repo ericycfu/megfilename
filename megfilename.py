@@ -17,7 +17,24 @@ class GUI:
     def initialize_variables(self, dpbox1, dpbox2, dpbox3, pat):
         self.mainframe = ttk.Frame(self.master, padding=(20, 20, 20, 20))
         #gets patient name, as file has format where name is the second element between forward slashes
-        self.name = self.read_file(pat).split("/")[1]
+        self.name = self.read_file(pat).split("\n")#newest patient loaded will be on last line of file
+        #removes blank lines from the file with a list of patient stuff.
+        print(len(self.name))
+        myiter = iter(self.name)
+        num_blank_lines = 0
+        while True:
+            try:
+                line = next(myiter)
+                if (line.strip() == ""):
+                    num_blank_lines += 1
+            except StopIteration:
+                break
+        for i in range(0, num_blank_lines):
+            self.name.remove(line)
+        print(len(self.name))
+        self.name = self.name[len(self.name)-1] #gets last line
+        print(self.name)
+        self.name = self.name.split("/")[1]
         self.name = self.name.strip()
         #gets initials from name, if only one word as name, duplicates the first initial
         self.initials = self.name.split()
@@ -245,13 +262,13 @@ class GUI:
             return ""
         index = mylist.index(number)
         #add the initials where they belong (after the number) and return rejoined string
-        mylist.insert(index + 1, self.initials)
+        mylist.insert(index + 1, self.user_text.get())
         return "_".join(mylist)
 
 dpbox1_fname = "mfn-dropdownbox1.txt"
 dpbox2_fname = "mfn-dropdownbox2.txt"
 dpbox3_fname = "mfn-dropdownbox3.txt"
-pat_fname = "mfn-myNames.txt"
+pat_fname = "index"
 root = Tk()
 my_gui = GUI(root, dpbox1_fname, dpbox2_fname, dpbox3_fname, pat_fname)
 root.mainloop()
